@@ -1,15 +1,20 @@
 package main
 
 import (
-	"anchor/config"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"sort"
+	"strings"
 
+	"anchor/config"
+
+	"github.com/ktr0731/go-fuzzyfinder"
 	"github.com/spf13/cobra"
 )
 
 func main() {
-	var cmdDown = &cobra.Command{
+	cmdDown := &cobra.Command{
 		Use:   "down [anchor_name]",
 		Short: "Sets the current directory as the default directory",
 		Args:  cobra.MaximumNArgs(1),
@@ -66,7 +71,7 @@ func main() {
 		},
 	}
 
-	var cmdUp = &cobra.Command{
+	cmdUp := &cobra.Command{
 		Use:   "up",
 		Short: "Unsets the default directory",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -80,7 +85,59 @@ func main() {
 		},
 	}
 
-	var cmdSave = &cobra.Command{
+	cmdGo := &cobra.Command{
+		Use:   "go [anchor_name]",
+		Short: "Navigates to the specified anchor or default anchor if none is given",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			var path string
+			var err error
+
+			if len(args) == 1 {
+				// Get the path of the named anchor
+				path, err = config.GetSavedAnchorPath(args[0])
+				if err != nil {
+					fmt.Println("Error getting saved anchor:", err)
+					return
+				}
+
+				if path == "" {
+					fmt.Println("No saved anchor named '" + args[0] + "'")
+					return
+				}
+			} else {
+				// Get the path of the default anchor
+				path, err := config.GetDefaultAnchor()
+				if err != nil {
+					fmt.Println("Error getting default anchor:", err)
+					return
+				}
+
+				if path == "" {
+					fmt.Println("No default anchor set")
+					return
+				}
+			}
+
+			fmt.Println(path)
+		},
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			savedAnchors, err := config.ListSavedAnchors()
+			if err != nil {
+				fmt.Println("Error getting saved anchors:", err)
+				return nil, cobra.ShellCompDirectiveError
+			}
+
+			savedAnchorNames := make([]string, 0, len(savedAnchors))
+			for anchorName := range savedAnchors {
+				savedAnchorNames = append(savedAnchorNames, anchorName)
+			}
+
+			return savedAnchorNames, cobra.ShellCompDirectiveNoFileComp
+		},
+	}
+
+	cmdSave := &cobra.Command{
 		Use:   "save [anchor_name]",
 		Short: "Saves the current directory as anchor_name",
 		Args:  cobra.ExactArgs(1),
@@ -101,7 +158,7 @@ func main() {
 		},
 	}
 
-	var cmdRemove = &cobra.Command{
+	cmdRemove := &cobra.Command{
 		Use:   "remove [anchor_name]",
 		Short: "Deletes the saved anchor_name directory",
 		Args:  cobra.ExactArgs(1),
@@ -116,7 +173,7 @@ func main() {
 		},
 	}
 
-	var cmdList = &cobra.Command{
+	cmdList := &cobra.Command{
 		Use:   "list",
 		Short: "List current saved directories",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -126,13 +183,73 @@ func main() {
 				return
 			}
 
-			for anchorName, anchorPath := range savedAnchors {
-				fmt.Println(anchorName, ":", anchorPath)
+			homeDir, err := os.UserHomeDir()
+			if err != nil {
+				fmt.Println("Error getting home directory:", err)
+				return
 			}
+
+			anchorNames := make([]string, 0, len(savedAnchors))
+			for anchorName := range savedAnchors {
+				anchorNames = append(anchorNames, anchorName)
+			}
+
+			idx, err := fuzzyfinder.Find(
+				anchorNames,
+				func(i int) string {
+					// Abbreviate home path as ~/
+					abbreviatedPath := strings.Replace(savedAnchors[anchorNames[i]], homeDir, "~", 1)
+					return anchorNames[i] + " ⚓️ " + abbreviatedPath
+				},
+				fuzzyfinder.WithPromptString("⚓️ > "),
+				fuzzyfinder.WithPreviewWindow(func(i, w, h int) string {
+					path := savedAnchors[anchorNames[i]]
+
+					files, err := ioutil.ReadDir(path)
+					if err != nil {
+						return "Error reading directory"
+					}
+
+					var directories, filesList []os.FileInfo
+					for _, file := range files {
+						if file.IsDir() {
+							directories = append(directories, file)
+						} else {
+							filesList = append(filesList, file)
+						}
+					}
+
+					// Sort alphabetically
+					sort.Slice(directories, func(i, j int) bool {
+						return directories[i].Name() < directories[j].Name()
+					})
+					sort.Slice(filesList, func(i, j int) bool {
+						return filesList[i].Name() < filesList[j].Name()
+					})
+
+					// Build the preview string with directories first, then files
+					var preview strings.Builder
+					for _, dir := range directories {
+						preview.WriteString("📁  " + dir.Name() + "/\n")
+					}
+					for _, file := range filesList {
+						preview.WriteString("📄  " + file.Name() + "\n")
+					}
+
+					return preview.String()
+				}),
+			)
+
+			if err != nil {
+				fmt.Println("Error listing saved anchors:", err)
+				return
+			}
+
+			fmt.Printf("⚓ Anchor '%s' selected! Path: %s\n", anchorNames[idx], savedAnchors[anchorNames[idx]])
 		},
 	}
 
-	var cmdGet = &cobra.Command{
+	cmdGet := &cobra.Command{
 		Use:   "get",
 		Short: "Get the path of the current anchor",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -144,7 +261,7 @@ func main() {
 		},
 	}
 
-	var completionCmd = &cobra.Command{
+	completionCmd := &cobra.Command{
 		Use:   "completion [bash|zsh|fish|powershell]",
 		Short: "Generate completion script",
 		Long: `To load completions:
@@ -176,8 +293,8 @@ $ yourprogram completion fish | source
 		},
 	}
 
-	var rootCmd = &cobra.Command{Use: "anchor"}
-	rootCmd.AddCommand(cmdDown, cmdUp, cmdSave, cmdRemove, cmdList, cmdGet, completionCmd)
+	rootCmd := &cobra.Command{Use: "anchor"}
+	rootCmd.AddCommand(cmdDown, cmdUp, cmdSave, cmdRemove, cmdGo, cmdList, cmdGet, completionCmd)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

@@ -37,7 +37,7 @@ func saveConfig(config *config) error {
 		return err
 	}
 
-	err = os.MkdirAll(configPath.dir, 0755)
+	err = os.MkdirAll(configPath.dir, 0o755)
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func saveConfig(config *config) error {
 		return err
 	}
 
-	err = os.WriteFile(configPath.path, marshalledConfig, 0644)
+	err = os.WriteFile(configPath.path, marshalledConfig, 0o644)
 	return err
 }
 
@@ -106,24 +106,32 @@ func readConfig() (*config, error) {
 }
 
 func PrintAnchor() error {
-	anchor := os.Getenv("ANCHOR")
-	if anchor != "" {
-		fmt.Println(anchor) // Print the anchor path for the shell to use
-		return nil
-	}
-
-	config, err := readConfig()
+	currentAnchor, err := GetDefaultAnchor()
 	if err != nil {
 		return err
 	}
 
-	if config.CurrentAnchor != nil {
-		fmt.Println(*config.CurrentAnchor) // Print the current anchor path for the shell to use
+	if currentAnchor != "" {
+		fmt.Println(currentAnchor) // Print the current anchor path for the shell to use
 		return nil
 	}
 
 	// If no anchor is set, do nothing.
 	return nil
+}
+
+func GetDefaultAnchor() (string, error) {
+	config, err := readConfig()
+	if err != nil {
+		return "", err
+	}
+
+	if config.CurrentAnchor == nil {
+		// Not set.
+		return "", nil
+	}
+
+	return *config.CurrentAnchor, nil
 }
 
 func SaveAnchor(anchorName, currentDir string) error {
