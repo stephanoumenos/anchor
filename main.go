@@ -65,7 +65,7 @@ func main() {
 				return
 			}
 
-			fmt.Println("⚓️ Anchor '" + args[0] + "' stashed at " + currentDir + ". Drop it with 'anchor down " + anchorName + "'.")
+			fmt.Println("⚓️ Anchor '" + args[0] + "' stashed at " + currentDir + ". Drop it with 'anchor down " + args[0] + "'.")
 		},
 	}
 
