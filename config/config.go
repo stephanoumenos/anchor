@@ -164,3 +164,21 @@ func ListSavedAnchors() (savedAnchors, error) {
 
 	return config.SavedAnchors, nil
 }
+
+func GetSavedAnchorPath(anchorName string) (string, error) {
+	config, err := readConfig()
+	if err != nil {
+		return "", err
+	}
+
+	if config.SavedAnchors == nil {
+		return "", nil
+	}
+
+	path, ok := config.SavedAnchors[anchorName]
+	if !ok {
+		return "", nil
+	}
+
+	return path, nil
+}

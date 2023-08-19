@@ -16,6 +16,24 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 1 {
 				// Implementation for setting named anchor as default directory
+				path, err := config.GetSavedAnchorPath(args[0])
+				if err != nil {
+					fmt.Println("Error getting saved anchor:", err)
+					return
+				}
+
+				if path == "" {
+					fmt.Println("No saved anchor named '" + args[0] + "'")
+					return
+				}
+
+				err = config.AnchorToPath(path)
+				if err != nil {
+					fmt.Println("Error setting anchor:", err)
+					return
+				}
+
+				fmt.Println("⚓️ Anchored to", path)
 			} else {
 				// Implementation for setting current directory as default directory
 				currentDir, err := os.Getwd()
