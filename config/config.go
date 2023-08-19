@@ -142,3 +142,25 @@ func SaveAnchor(anchorName, currentDir string) error {
 	err = saveConfig(config)
 	return err
 }
+
+func RemoveAnchor(anchorName string) error {
+	config, err := readConfig()
+	if err != nil {
+		return err
+	}
+
+	// Remove the anchor
+	delete(config.SavedAnchors, anchorName)
+
+	err = saveConfig(config)
+	return err
+}
+
+func ListSavedAnchors() (savedAnchors, error) {
+	config, err := readConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	return config.SavedAnchors, nil
+}

@@ -44,7 +44,7 @@ func main() {
 				return
 			}
 
-			fmt.Println("⛵️ Anchor unset")
+			fmt.Println("⛵️ Anchor lifted")
 		},
 	}
 
@@ -53,21 +53,19 @@ func main() {
 		Short: "Saves the current directory as anchor_name",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			anchorName := args[0]
-
 			currentDir, err := os.Getwd()
 			if err != nil {
 				fmt.Println("Error getting current directory:", err)
 				return
 			}
 
-			err = config.SaveAnchor(anchorName, currentDir)
+			err = config.SaveAnchor(args[0], currentDir)
 			if err != nil {
 				fmt.Println("Error saving anchor:", err)
 				return
 			}
 
-			fmt.Println("⚓️ saved anchor", anchorName, " to", currentDir)
+			fmt.Println("⚓️ Anchor '" + args[0] + "' stashed at " + currentDir + ". Drop it with 'anchor down " + anchorName + "'.")
 		},
 	}
 
@@ -76,7 +74,13 @@ func main() {
 		Short: "Deletes the saved anchor_name directory",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			// Implementation for removing the saved anchor_name directory
+			err := config.RemoveAnchor(args[0])
+			if err != nil {
+				fmt.Println("Error removing anchor:", err)
+				return
+			}
+
+			fmt.Println("⚓️ Anchor '" + args[0] + "' removed.")
 		},
 	}
 
@@ -84,7 +88,15 @@ func main() {
 		Use:   "list",
 		Short: "List current saved directories",
 		Run: func(cmd *cobra.Command, args []string) {
-			// Implementation for listing saved directories
+			savedAnchors, err := config.ListSavedAnchors()
+			if err != nil {
+				fmt.Println("Error listing saved anchors:", err)
+				return
+			}
+
+			for anchorName, anchorPath := range savedAnchors {
+				fmt.Println(anchorName, ":", anchorPath)
+			}
 		},
 	}
 
