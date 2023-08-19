@@ -36,7 +36,11 @@ func main() {
 		Use:   "up",
 		Short: "Unsets the default directory",
 		Run: func(cmd *cobra.Command, args []string) {
-			// Implementation for unsetting the default directory
+			err := config.Unanchor()
+			if err != nil {
+				fmt.Println("Error unsetting anchor:", err)
+				return
+			}
 		},
 	}
 

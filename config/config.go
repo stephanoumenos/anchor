@@ -60,3 +60,16 @@ func AnchorToPath(path string) error {
 		},
 	)
 }
+
+func Unanchor() error {
+	err := os.Unsetenv("ANCHOR")
+	if err != nil {
+		return err
+	}
+
+	return saveConfig(
+		&config{
+			CurrentAnchor: nil,
+		},
+	)
+}
