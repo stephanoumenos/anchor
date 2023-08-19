@@ -53,7 +53,21 @@ func main() {
 		Short: "Saves the current directory as anchor_name",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			// Implementation for saving the current directory
+			anchorName := args[0]
+
+			currentDir, err := os.Getwd()
+			if err != nil {
+				fmt.Println("Error getting current directory:", err)
+				return
+			}
+
+			err = config.SaveAnchor(anchorName, currentDir)
+			if err != nil {
+				fmt.Println("Error saving anchor:", err)
+				return
+			}
+
+			fmt.Println("⚓️ saved anchor", anchorName, " to", currentDir)
 		},
 	}
 

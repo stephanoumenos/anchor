@@ -7,8 +7,11 @@ import (
 )
 
 type config struct {
-	CurrentAnchor *string `json:"current_anchor"`
+	CurrentAnchor *string      `json:"current_anchor"`
+	SavedAnchors  savedAnchors `json:"saved_anchors"`
 }
+
+type savedAnchors map[string]string
 
 // Just to avoid calling filepath.Dir to get the directory
 type configPath struct {
@@ -54,12 +57,15 @@ func AnchorToPath(path string) error {
 		return err
 	}
 
-	// Save to config file
-	return saveConfig(
-		&config{
-			CurrentAnchor: &path,
-		},
-	)
+	config, err := readConfig()
+	if err != nil {
+		return err
+	}
+
+	config.CurrentAnchor = &path
+
+	err = saveConfig(config)
+	return err
 }
 
 func Unanchor() error {
@@ -68,11 +74,15 @@ func Unanchor() error {
 		return err
 	}
 
-	return saveConfig(
-		&config{
-			CurrentAnchor: nil,
-		},
-	)
+	config, err := readConfig()
+	if err != nil {
+		return err
+	}
+
+	config.CurrentAnchor = nil
+
+	err = saveConfig(config)
+	return err
 }
 
 func readConfig() (*config, error) {
@@ -114,4 +124,21 @@ func PrintAnchor() error {
 
 	// If no anchor is set, do nothing.
 	return nil
+}
+
+func SaveAnchor(anchorName, currentDir string) error {
+	config, err := readConfig()
+	if err != nil {
+		return err
+	}
+
+	// Save the new anchor
+	if config.SavedAnchors == nil {
+		config.SavedAnchors = make(map[string]string)
+	}
+	config.SavedAnchors[anchorName] = currentDir
+
+	// Save the updated config
+	err = saveConfig(config)
+	return err
 }
