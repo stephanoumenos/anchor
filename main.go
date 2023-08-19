@@ -28,6 +28,8 @@ func main() {
 					fmt.Println("Error setting anchor:", err)
 					return
 				}
+
+				fmt.Println("⚓️ Anchored to", currentDir)
 			}
 		},
 	}
@@ -41,6 +43,8 @@ func main() {
 				fmt.Println("Error unsetting anchor:", err)
 				return
 			}
+
+			fmt.Println("⛵️ Anchor unset")
 		},
 	}
 
