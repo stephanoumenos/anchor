@@ -70,8 +70,20 @@ func main() {
 		},
 	}
 
+	var cmdGet = &cobra.Command{
+		Use:   "get",
+		Short: "Get the path of the current anchor",
+		Run: func(cmd *cobra.Command, args []string) {
+			err := config.PrintAnchor()
+			if err != nil {
+				fmt.Println("Error getting current anchor:", err)
+				return
+			}
+		},
+	}
+
 	var rootCmd = &cobra.Command{Use: "anchor"}
-	rootCmd.AddCommand(cmdDown, cmdUp, cmdSave, cmdRemove, cmdList)
+	rootCmd.AddCommand(cmdDown, cmdUp, cmdSave, cmdRemove, cmdList, cmdGet)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

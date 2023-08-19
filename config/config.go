@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
@@ -72,4 +73,45 @@ func Unanchor() error {
 			CurrentAnchor: nil,
 		},
 	)
+}
+
+func readConfig() (*config, error) {
+	configPath, err := getConfigPath()
+	if err != nil {
+		return nil, err
+	}
+
+	file, err := os.ReadFile(configPath.path)
+	if err != nil {
+		return nil, err
+	}
+
+	var config config
+	err = json.Unmarshal(file, &config)
+	if err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+func PrintAnchor() error {
+	anchor := os.Getenv("ANCHOR")
+	if anchor != "" {
+		fmt.Println(anchor) // Print the anchor path for the shell to use
+		return nil
+	}
+
+	config, err := readConfig()
+	if err != nil {
+		return err
+	}
+
+	if config.CurrentAnchor != nil {
+		fmt.Println(*config.CurrentAnchor) // Print the current anchor path for the shell to use
+		return nil
+	}
+
+	// If no anchor is set, do nothing.
+	return nil
 }
