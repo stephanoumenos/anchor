@@ -245,7 +245,8 @@ func main() {
 				return
 			}
 
-			fmt.Printf("⚓ Anchor '%s' selected! Path: %s\n", anchorNames[idx], savedAnchors[anchorNames[idx]])
+			abbreviatedPath := strings.Replace(savedAnchors[anchorNames[idx]], homeDir, "~", 1)
+			fmt.Printf("⚓ Anchor '%s' selected! Path: %s\n", anchorNames[idx], abbreviatedPath)
 		},
 	}
 
