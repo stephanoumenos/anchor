@@ -90,12 +90,9 @@ func main() {
 		Short: "Navigates to the specified anchor or default anchor if none is given",
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			var path string
-			var err error
-
 			if len(args) == 1 {
 				// Get the path of the named anchor
-				path, err = config.GetSavedAnchorPath(args[0])
+				path, err := config.GetSavedAnchorPath(args[0])
 				if err != nil {
 					fmt.Println("Error getting saved anchor:", err)
 					return
@@ -105,6 +102,8 @@ func main() {
 					fmt.Println("No saved anchor named '" + args[0] + "'")
 					return
 				}
+
+				fmt.Println(path)
 			} else {
 				// Get the path of the default anchor
 				path, err := config.GetDefaultAnchor()
@@ -117,9 +116,9 @@ func main() {
 					fmt.Println("No default anchor set")
 					return
 				}
-			}
 
-			fmt.Println(path)
+				fmt.Println(path)
+			}
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			savedAnchors, err := config.ListSavedAnchors()
