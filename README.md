@@ -37,7 +37,7 @@ echo 'anchor() {\
     if [[ -n $$anchor_path ]]; then\
       cd "$$anchor_path";\
     else\
-      echo "No saved anchor to go to.";\
+      echo "⛵️ No default anchor set. Use 'anchor down' to set your current directory as the default.";\
     fi;\
   else\
     command anchor "$$@";\
@@ -60,7 +60,7 @@ echo 'anchor() {\
     if [[ -n $$anchor_path ]]; then\
       cd "$$anchor_path";\
     else\
-      echo "No saved anchor to go to.";\
+      echo "⛵️ No default anchor set. Use 'anchor down' to set your current directory as the default.";\
     fi;\
   else\
     command anchor "$$@";\
@@ -83,7 +83,7 @@ echo 'function anchor\
     if test -n $$anchor_path;\
       cd $$anchor_path;\
     else;\
-      echo "No saved anchor to go to.";\
+      echo "⛵️ No default anchor set. Use 'anchor down' to set your current directory as the default.";\
     end;\
   else;\
     command anchor $$argv;\

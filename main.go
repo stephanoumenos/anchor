@@ -113,7 +113,6 @@ func main() {
 				}
 
 				if path == "" {
-					fmt.Println("No default anchor set")
 					return
 				}
 
