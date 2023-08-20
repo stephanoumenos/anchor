@@ -117,7 +117,6 @@ func main() {
 						return anchorNames[i] + " ⚓️ " + abbreviatedPath
 					},
 				)
-
 				if err != nil {
 					fmt.Println("Error selecting anchor:", err)
 					return
@@ -263,7 +262,6 @@ func main() {
 					return preview.String()
 				}),
 			)
-
 			if err != nil {
 				fmt.Println("Error listing saved anchors:", err)
 				return
