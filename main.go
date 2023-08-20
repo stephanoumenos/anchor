@@ -99,7 +99,6 @@ func main() {
 				}
 
 				if path == "" {
-					fmt.Println("No saved anchor named '" + args[0] + "'")
 					return
 				}
 

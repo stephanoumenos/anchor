@@ -36,8 +36,10 @@ echo 'anchor() {\
     local anchor_path="$$(command anchor go $$2 2>/dev/null)";\
     if [[ -n $$anchor_path ]]; then\
       cd "$$anchor_path";\
+    elif [[ -n $$2 ]]; then\
+      echo "⛵️ No saved anchor named '\''$$2'\'' found.";\
     else\
-      echo "⛵️ No default anchor set. Use 'anchor down' to set your current directory as the default.";\
+      echo "⛵️ No default anchor set. Use '\''anchor down'\'' to set your current directory as the default.";\
     fi;\
   else\
     command anchor "$$@";\
@@ -59,8 +61,10 @@ echo 'anchor() {\
     local anchor_path="$$(command anchor go $$2 2>/dev/null)";\
     if [[ -n $$anchor_path ]]; then\
       cd "$$anchor_path";\
+    elif [[ -n $$2 ]]; then\
+      echo "⛵️ No saved anchor named '\''$$2'\'' found.";\
     else\
-      echo "⛵️ No default anchor set. Use 'anchor down' to set your current directory as the default.";\
+      echo "⛵️ No default anchor set. Use '\''anchor down'\'' to set your current directory as the default.";\
     fi;\
   else\
     command anchor "$$@";\
@@ -82,8 +86,10 @@ echo 'function anchor\
     set anchor_path (command anchor go $$argv[2] 2>/dev/null);\
     if test -n $$anchor_path;\
       cd $$anchor_path;\
+    else if test -n $$argv[2];\
+      echo "⛵️ No saved anchor named '\''$$argv[2]'\'' found.";\
     else;\
-      echo "⛵️ No default anchor set. Use 'anchor down' to set your current directory as the default.";\
+      echo "⛵️ No default anchor set. Use '\''anchor down'\'' to set your current directory as the default.";\
     end;\
   else;\
     command anchor $$argv;\
