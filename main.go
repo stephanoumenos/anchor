@@ -90,32 +90,73 @@ func main() {
 		Short: "Navigates to the specified anchor or default anchor if none is given",
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) == 1 {
-				// Get the path of the named anchor
-				path, err := config.GetSavedAnchorPath(args[0])
+			fuzzyFlag, err := cmd.Flags().GetBool("fuzzy")
+			if err != nil {
+				fmt.Println("Error getting fuzzy flag:", err)
+				return
+			}
+
+			if fuzzyFlag {
+				savedAnchors, err := config.ListSavedAnchors()
 				if err != nil {
-					fmt.Println("Error getting saved anchor:", err)
+					fmt.Println("Error getting saved anchors:", err)
 					return
 				}
 
-				if path == "" {
+				anchorNames := make([]string, 0, len(savedAnchors))
+				for anchorName := range savedAnchors {
+					anchorNames = append(anchorNames, anchorName)
+				}
+
+				homeDir, err := os.UserHomeDir()
+				if err != nil {
+					fmt.Println("Error getting home directory:", err)
 					return
 				}
 
+				idx, err := fuzzyfinder.Find(
+					anchorNames,
+					func(i int) string {
+						abbreviatedPath := strings.Replace(savedAnchors[anchorNames[i]], homeDir, "~", 1)
+						return anchorNames[i] + " ⚓️ " + abbreviatedPath
+					},
+				)
+
+				if err != nil {
+					fmt.Println("Error selecting anchor:", err)
+					return
+				}
+
+				path := savedAnchors[anchorNames[idx]]
 				fmt.Println(path)
 			} else {
-				// Get the path of the default anchor
-				path, err := config.GetDefaultAnchor()
-				if err != nil {
-					fmt.Println("Error getting default anchor:", err)
-					return
-				}
+				if len(args) == 1 {
+					// Get the path of the named anchor
+					path, err := config.GetSavedAnchorPath(args[0])
+					if err != nil {
+						fmt.Println("Error getting saved anchor:", err)
+						return
+					}
 
-				if path == "" {
-					return
-				}
+					if path == "" {
+						return
+					}
 
-				fmt.Println(path)
+					fmt.Println(path)
+				} else {
+					// Get the path of the default anchor
+					path, err := config.GetDefaultAnchor()
+					if err != nil {
+						fmt.Println("Error getting default anchor:", err)
+						return
+					}
+
+					if path == "" {
+						return
+					}
+
+					fmt.Println(path)
+				}
 			}
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
@@ -133,6 +174,8 @@ func main() {
 			return savedAnchorNames, cobra.ShellCompDirectiveNoFileComp
 		},
 	}
+
+	cmdGo.Flags().BoolP("fuzzy", "f", false, "Enable fuzzy finding mode")
 
 	cmdSave := &cobra.Command{
 		Use:   "save [anchor_name]",
