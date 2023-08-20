@@ -13,6 +13,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func validArgsFunction(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	savedAnchorNames, err := config.GetSavedAnchorNames()
+	if err != nil {
+		fmt.Println("Error getting saved anchors:", err)
+		return nil, cobra.ShellCompDirectiveError
+	}
+	return savedAnchorNames, cobra.ShellCompDirectiveNoFileComp
+}
+
 func main() {
 	cmdDown := &cobra.Command{
 		Use:   "down [anchor_name]",
@@ -55,20 +64,7 @@ func main() {
 				fmt.Println("⚓️ Anchored to", currentDir)
 			}
 		},
-		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			savedAnchors, err := config.ListSavedAnchors()
-			if err != nil {
-				fmt.Println("Error getting saved anchors:", err)
-				return nil, cobra.ShellCompDirectiveError
-			}
-
-			savedAnchorNames := make([]string, 0, len(savedAnchors))
-			for anchorName := range savedAnchors {
-				savedAnchorNames = append(savedAnchorNames, anchorName)
-			}
-
-			return savedAnchorNames, cobra.ShellCompDirectiveNoFileComp
-		},
+		ValidArgsFunction: validArgsFunction,
 	}
 
 	cmdUp := &cobra.Command{
@@ -159,20 +155,7 @@ func main() {
 				}
 			}
 		},
-		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			savedAnchors, err := config.ListSavedAnchors()
-			if err != nil {
-				fmt.Println("Error getting saved anchors:", err)
-				return nil, cobra.ShellCompDirectiveError
-			}
-
-			savedAnchorNames := make([]string, 0, len(savedAnchors))
-			for anchorName := range savedAnchors {
-				savedAnchorNames = append(savedAnchorNames, anchorName)
-			}
-
-			return savedAnchorNames, cobra.ShellCompDirectiveNoFileComp
-		},
+		ValidArgsFunction: validArgsFunction,
 	}
 
 	cmdGo.Flags().BoolP("fuzzy", "f", false, "Enable fuzzy finding mode")
@@ -211,6 +194,7 @@ func main() {
 
 			fmt.Println("⚓️ Anchor '" + args[0] + "' removed.")
 		},
+		ValidArgsFunction: validArgsFunction,
 	}
 
 	cmdList := &cobra.Command{

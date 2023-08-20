@@ -190,3 +190,18 @@ func GetSavedAnchorPath(anchorName string) (string, error) {
 
 	return path, nil
 }
+
+func GetSavedAnchorNames() ([]string, error) {
+	config, err := readConfig()
+	if err != nil {
+		return nil, err
+	}
+	if config.SavedAnchors == nil {
+		return nil, nil
+	}
+	var names []string
+	for name := range config.SavedAnchors {
+		names = append(names, name)
+	}
+	return names, nil
+}
