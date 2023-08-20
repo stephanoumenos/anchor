@@ -239,7 +239,7 @@ func main() {
 				func(i int) string {
 					// Abbreviate home path as ~/
 					abbreviatedPath := strings.Replace(savedAnchors[anchorNames[i]], homeDir, "~", 1)
-					return anchorNames[i] + " ⚓️ " + abbreviatedPath
+					return anchorNames[i] + ": " + abbreviatedPath
 				},
 				fuzzyfinder.WithPromptString("⚓️ > "),
 				fuzzyfinder.WithPreviewWindow(func(i, w, h int) string {
@@ -286,7 +286,7 @@ func main() {
 			}
 
 			abbreviatedPath := strings.Replace(savedAnchors[anchorNames[idx]], homeDir, "~", 1)
-			fmt.Printf("⚓ Anchor '%s' selected! Path: %s\n", anchorNames[idx], abbreviatedPath)
+			fmt.Println("⚓", anchorNames[idx]+":", abbreviatedPath)
 		},
 	}
 
