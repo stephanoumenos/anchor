@@ -48,7 +48,8 @@ echo 'anchor() {\
 \
 if [[ $$PWD == $$HOME ]]; then\
   eval "cd $$(anchor get)";\
-fi' >> ~/.zshrc
+fi\
+source <(anchor completion zsh)' >> ~/.zshrc
 ```
 
 #### For bash:
@@ -73,7 +74,8 @@ echo 'anchor() {\
 \
 if [[ $$PWD == $$HOME ]]; then\
   eval "cd $$(anchor get)";\
-fi' >> ~/.bashrc
+fi\
+source <(anchor completion bash)' >> ~/.bashrc
 ```
 
 #### For fish:
@@ -98,7 +100,8 @@ end\
 \
 if test $$PWD = $$HOME;\
   eval "cd (anchor get)";\
-end' >> ~/.config/fish/config.fish
+end\
+anchor completion fish | source' >> ~/.config/fish/config.fish
 ```
 
 ### 5. Apply Changes
