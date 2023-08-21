@@ -44,6 +44,12 @@ Go to your saved anchor whenever you open your terminal, or manually navigate to
 anchor go [anchor_name]
 ```
 
+Use the `-f` flag to enable fuzzy finding mode, allowing you to easily search and select an anchor from your saved anchors:
+
+```bash
+anchor go -f
+```
+
 ### Delete a saved anchor
 
 Delete a saved anchor directory.
