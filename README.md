@@ -1,5 +1,81 @@
 # anchor
 
+Anchor is a CLI designed to streamline your navigation in the terminal. The main purpose of this tool is to allow you to go to your saved directory anchor automatically whenever you open your terminal. This is particularly helpful for project management, as you can easily navigate to different project directories saved as anchors.
+
+## Key Features
+
+- **Automatically Navigate to Default Anchor:** Open your terminal to your saved anchor automatically, every time.
+- **Project Management:** Manage your various project directories by saving them as named anchors.
+- **Easy Navigation:** Use simple commands to navigate between your anchors, save new ones, and more.
+
+## Usage
+
+Below are the available commands for the Anchor CLI.
+
+### Set the default directory
+
+Set the current directory or a named anchor as the default directory to automatically navigate to.
+
+```bash
+anchor down [anchor_name]
+```
+
+### Unset Default Directory
+
+Unset the current default directory.
+
+```bash
+anchor up
+```
+
+### Create a saved Anchor
+
+Save the current directory as a named anchor for easy project navigation.
+
+```bash
+anchor save [anchor_name]
+```
+
+### Navigate to an anchor
+
+Go to your saved anchor whenever you open your terminal, or manually navigate to one of your saved named anchors.
+
+```bash
+anchor go [anchor_name]
+```
+
+### Delete a saved anchor
+
+Delete a saved anchor directory.
+
+```bash
+anchor remove [anchor_name]
+```
+
+### Get Current Anchor Path
+
+Get the path of the current anchor.
+
+```bash
+anchor get
+```
+
+### List Saved Anchors
+
+List the current saved project directories.
+
+```bash
+anchor list
+```
+
+### Generate Completion Script
+
+Generate the completion script for different shell environments.
+
+```bash
+anchor completion [bash|zsh|fish|powershell]
+```
+
 # Installation
 
 ### Pre-requisites
