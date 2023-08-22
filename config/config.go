@@ -92,6 +92,9 @@ func readConfig() (*config, error) {
 	}
 
 	file, err := os.ReadFile(configPath.path)
+	if os.IsNotExist(err) {
+		return &config{}, nil
+	}
 	if err != nil {
 		return nil, err
 	}
